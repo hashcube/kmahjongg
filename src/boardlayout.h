@@ -35,6 +35,7 @@ public:
     }
     void deleteTile(POSITION & p);
     bool anyFilled(POSITION & p) const;
+    bool halfFilled(POSITION &p) const;
     bool allFilled(POSITION & p) const;
     void insertTile(POSITION & p);
     bool isTileAt(POSITION & p) const
