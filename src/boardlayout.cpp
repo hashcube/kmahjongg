@@ -20,9 +20,9 @@ inline QString layoutMagic1_1() { return QStringLiteral("kmahjongg-layout-v1.1")
 BoardLayout::BoardLayout()
 {
     m_filename.clear();
-    m_width = 32;
-    m_height = 16;
-    m_depth = 5;
+    m_width = 20;
+    m_height = 32;
+    m_depth = 15;
     m_board = QByteArray(m_width * m_height * m_depth, 0);
     clearBoardLayout();
 }
@@ -368,18 +368,39 @@ void BoardLayout::deleteTile(POSITION & p)
         setBoardData(p.z, p.y, p.x + 1, 0);
         setBoardData(p.z, p.y + 1, p.x, 0);
         setBoardData(p.z, p.y + 1, p.x + 1, 0);
+
+        // added these 5 lines to allow deletion in all the directions
+        setBoardData(p.z,p.y-1,p.x,0);
+        setBoardData(p.z,p.y-1,p.x-1,0);
+        setBoardData(p.z,p.y,p.x-1,0);
+        setBoardData(p.z,p.y-1,p.x+1,0);
+        setBoardData(p.z,p.y+1,p.x-1,0);
         --m_maxTileNum;
     }
 }
 
 bool BoardLayout::anyFilled(POSITION & p) const
 {
-    return (getBoardData(p.z, p.y, p.x) != 0 || getBoardData(p.z, p.y, p.x + 1) != 0 || getBoardData(p.z, p.y + 1, p.x) != 0 || getBoardData(p.z, p.y + 1, p.x + 1) != 0);
+    return (getBoardData(p.z, p.y, p.x) != 0 ||
+            getBoardData(p.z, p.y, p.x + 1) != 0 ||
+            getBoardData(p.z, p.y + 1, p.x) != 0 ||
+            getBoardData(p.z, p.y + 1, p.x + 1) != 0);
+}
+
+bool BoardLayout::halfFilled(POSITION &p) const
+{
+    return(!getBoardData(p.z, p.y, p.x) &&
+           getBoardData(p.z, p.y, p.x+1) &&
+           !getBoardData(p.z, p.y+1, p.x) &&
+           getBoardData(p.z, p.y+1, p.x+1));
 }
 
 bool BoardLayout::allFilled(POSITION & p) const
 {
-    return (getBoardData(p.z, p.y, p.x) != 0 && getBoardData(p.z, p.y, p.x + 1) != 0 && getBoardData(p.z, p.y + 1, p.x) != 0 && getBoardData(p.z, p.y + 1, p.x + 1) != 0);
+    return (getBoardData(p.z, p.y, p.x) != 0 &&
+            getBoardData(p.z, p.y, p.x + 1) != 0 &&
+            getBoardData(p.z, p.y + 1, p.x) != 0 &&
+            getBoardData(p.z, p.y+1, p.x+1) != 0);
 }
 
 void BoardLayout::insertTile(POSITION & p)

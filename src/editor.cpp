@@ -21,6 +21,7 @@
 // KF
 #include <KActionCollection>
 #include <KLocalizedString>
+// #include <QProcess>
 #include <KMessageBox>
 #include <KStandardAction>
 #include <KToggleAction>
@@ -338,7 +339,8 @@ bool Editor::saveBoard()
 
     if (result == true) {
         m_clean = true;
-
+        // QProcess process;
+        // process.startDetached("/bin/sh", QStringList()<< "../openElectron.sh" << filename../);
         return true;
     } else {
         return false;
@@ -482,6 +484,7 @@ void Editor::transformPointToPosition(const QPoint & point, POSITION & mouseClic
     short y = 0;
     short x = 0;
     mouseClickPos.z = 100;
+    POSITION n;
 
     // iterate over z coordinate from top to bottom
     for (z = m_theBoard.getDepth() - 1; z >= 0; --z) {
@@ -539,6 +542,21 @@ void Editor::transformPointToPosition(const QPoint & point, POSITION & mouseClic
 
         break;
     }
+
+    //  n.x = x;
+    //  n.y = y;
+    //  n.z = z = 0;
+    //  while(m_theBoard.halfFilled(n))
+    //  {
+    //      n.z = ++z;
+    //      if (!m_theBoard.getBoardData(z, y, x) && !m_theBoard.getBoardData(z, y+1, x) && !m_theBoard.getBoardData(z, y, x+1) && !m_theBoard.getBoardData(z, y+1, x+1))
+    //      {
+    //        mouseClickPos.z = z-1;
+    //        mouseClickPos.x = n.x;
+    //        mouseClickPos.y = n.y;
+    //        break;
+    //      }
+    //  }
 
     if (mouseClickPos.z == 100) {
         mouseClickPos.x = x;
@@ -661,16 +679,20 @@ bool Editor::canInsert(POSITION & p) const
         return false;
     }
 
+    //this was causing restrictions in placing two tiles above one
     POSITION n = p;
 
     if (p.z != 0) {
         n.z -= 1;
-        if (!m_theBoard.allFilled(n)) {
-            return false;
+        if (!m_theBoard.anyFilled(n)) {
+            return true;
         }
     }
 
     return !m_theBoard.anyFilled(p);
+
+    //this was returning false while inserting z+1 position
+    // return true;
 }
 
 void Editor::closeEvent(QCloseEvent * e)
