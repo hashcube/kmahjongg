@@ -52,13 +52,30 @@ Go to KMahjong Configuration -> Board Layouts and you can see the newly created 
   - let the default options be selected(like directory locations to keep path shorter)
   - make sure the Microsoft Visual Studio is selected instead of Mingw
 
-- Start craft cli with: C:\CraftRoot\craft\craftenv.ps1
+- Start craft cli with: `C:\CraftRoot\craft\craftenv.ps1`
 - Install kmahjongg dependencies and build it:
-	- craft kmahjongg
+  ```
+	craft --buildtype Release kmahjongg
+  ```
   - if the build is successful, check the location with `cs kmahjongg`, the path format would be like C:\\_\\[alphanumeric_dir]\kmahjongg[version]
   - check
 - Final build location: C:\CraftRoot\bin\ , which contains kmahjongg.exe
-- For running kmhajongg build independently:
+- For creating setup:
+  ```
+  craft nsis
+  ```
+  ```
+  craft --buildtype Release --package kmahjongg
+  ```
+  - Resolve some missing dependency during the package process:
+    ```
+    craft -i --buildtype Release libs/runtime
+    ```
+    ```
+    craft -i --buildtype Release dev-utils/snoretoast
+    ```
+  - Final output setup .exe file is in C:\CraftRoot\temp\
+- For running kmhajongg build independently without creating a setup .exe file:
   - Extract the build-template.zip
   - Copy the C:\CraftRoot\bin\ content into build-template\bin\
 
