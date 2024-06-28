@@ -242,8 +242,9 @@ void BoardLayout::initialiseBoard()
                 y = 0;
 
                 if (++z == m_depth) {
-                    // number of tiles have to be even
-                    if (m_maxTileNum & 1) {
+                    // number of tiles have to be even or divisible by 3
+                    // keeping even check as well to avoid crash in windows build on default even layout load
+                    if (m_maxTileNum & 1 || m_maxTileNum % 3) {
                         break;
                     }
                     return;
@@ -370,37 +371,22 @@ void BoardLayout::deleteTile(POSITION & p)
         setBoardData(p.z, p.y + 1, p.x + 1, 0);
 
         // added these 5 lines to allow deletion in all the directions
-        setBoardData(p.z,p.y-1,p.x,0);
-        setBoardData(p.z,p.y-1,p.x-1,0);
-        setBoardData(p.z,p.y,p.x-1,0);
-        setBoardData(p.z,p.y-1,p.x+1,0);
-        setBoardData(p.z,p.y+1,p.x-1,0);
+        setBoardData(p.z, p.y-1, p.x, 0);
+        setBoardData(p.z, p.y-1, p.x-1, 0);
+        setBoardData(p.z, p.y, p.x-1, 0);
+        setBoardData(p.z, p.y-1, p.x+1, 0);
+        setBoardData(p.z, p.y+1, p.x-1, 0);
         --m_maxTileNum;
     }
 }
 
+// check if there are any tile intercepting the 4 cells of a tile
 bool BoardLayout::anyFilled(POSITION & p) const
 {
     return (getBoardData(p.z, p.y, p.x) != 0 ||
             getBoardData(p.z, p.y, p.x + 1) != 0 ||
             getBoardData(p.z, p.y + 1, p.x) != 0 ||
             getBoardData(p.z, p.y + 1, p.x + 1) != 0);
-}
-
-bool BoardLayout::halfFilled(POSITION &p) const
-{
-    return(!getBoardData(p.z, p.y, p.x) &&
-           getBoardData(p.z, p.y, p.x+1) &&
-           !getBoardData(p.z, p.y+1, p.x) &&
-           getBoardData(p.z, p.y+1, p.x+1));
-}
-
-bool BoardLayout::allFilled(POSITION & p) const
-{
-    return (getBoardData(p.z, p.y, p.x) != 0 &&
-            getBoardData(p.z, p.y, p.x + 1) != 0 &&
-            getBoardData(p.z, p.y + 1, p.x) != 0 &&
-            getBoardData(p.z, p.y+1, p.x+1) != 0);
 }
 
 void BoardLayout::insertTile(POSITION & p)

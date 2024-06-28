@@ -120,7 +120,7 @@ msgstr "Board Layout (*.layout);;All Files (*)"
 #: src/editor.cpp:324
 #, kde-format
 msgid "You can only save with a even number of tiles."
-msgstr "You can only save with a even number of tiles."
+msgstr "You can only save layout with tile count divisible by 3."
 
 #: src/editor.cpp:330
 #, kde-format

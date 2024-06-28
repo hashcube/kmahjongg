@@ -21,7 +21,6 @@
 // KF
 #include <KActionCollection>
 #include <KLocalizedString>
-// #include <QProcess>
 #include <KMessageBox>
 #include <KStandardAction>
 #include <KToggleAction>
@@ -225,7 +224,7 @@ void Editor::setupToolbar()
 
 void Editor::statusChanged() const
 {
-    const bool canSave = ((m_numTiles != 0) && ((m_numTiles & 1) == 0));
+    const bool canSave = ((m_numTiles != 0) && ((m_numTiles % 3) == 0));
     m_theLabel->setText(statusText());
     m_actionCollection->action(QStringLiteral("save_board"))->setEnabled(canSave);
 }
@@ -321,7 +320,7 @@ void Editor::newBoard()
 
 bool Editor::saveBoard()
 {
-    if (!((m_numTiles != 0) && ((m_numTiles & 1) == 0))) {
+    if (!((m_numTiles != 0) && ((m_numTiles % 3) == 0))) {
         KMessageBox::error(this, i18n("You can only save with a even number of tiles."));
 
         return false;
@@ -339,8 +338,6 @@ bool Editor::saveBoard()
 
     if (result == true) {
         m_clean = true;
-        // QProcess process;
-        // process.startDetached("/bin/sh", QStringList()<< "../openElectron.sh" << filename../);
         return true;
     } else {
         return false;
@@ -487,6 +484,7 @@ void Editor::transformPointToPosition(const QPoint & point, POSITION & mouseClic
     POSITION n;
 
     // iterate over z coordinate from top to bottom
+    // and stop when any of the 9 tiles is found which is intercepting that position
     for (z = m_theBoard.getDepth() - 1; z >= 0; --z) {
         // calculate mouse coordinates --> position in game board
         // the factor -theTiles.width()/2 must keep track with the
@@ -499,38 +497,11 @@ void Editor::transformPointToPosition(const QPoint & point, POSITION & mouseClic
             continue;
         }
 
-        switch (m_theBoard.getBoardData(z, y, x)) {
-            case static_cast<UCHAR>('3'):
-                if (align) {
-                    --x;
-                    --y;
-                }
+        n.x = x;
+        n.y = y;
+        n.z = z;
 
-                break;
-
-            case static_cast<UCHAR>('2'):
-                if (align) {
-                    --x;
-                }
-
-                break;
-
-            case static_cast<UCHAR>('4'):
-                if (align) {
-                    --y;
-                }
-
-                break;
-
-            case static_cast<UCHAR>('1'):
-                break;
-
-            default:
-                continue;
-        }
-
-        // if gameboard is empty, skip
-        if (!m_theBoard.getBoardData(z, y, x)) {
+        if (!m_theBoard.anyFilled(n)) {
             continue;
         }
 
@@ -542,21 +513,6 @@ void Editor::transformPointToPosition(const QPoint & point, POSITION & mouseClic
 
         break;
     }
-
-    //  n.x = x;
-    //  n.y = y;
-    //  n.z = z = 0;
-    //  while(m_theBoard.halfFilled(n))
-    //  {
-    //      n.z = ++z;
-    //      if (!m_theBoard.getBoardData(z, y, x) && !m_theBoard.getBoardData(z, y+1, x) && !m_theBoard.getBoardData(z, y, x+1) && !m_theBoard.getBoardData(z, y+1, x+1))
-    //      {
-    //        mouseClickPos.z = z-1;
-    //        mouseClickPos.x = n.x;
-    //        mouseClickPos.y = n.y;
-    //        break;
-    //      }
-    //  }
 
     if (mouseClickPos.z == 100) {
         mouseClickPos.x = x;
@@ -663,36 +619,16 @@ void Editor::drawFrameMouseMovedEvent(QMouseEvent * e)
 
 bool Editor::canInsert(POSITION & p) const
 {
-    // can we inser a tile here. We can iff
-    // there are tiles in all positions below us (or we are a ground level)
-    // there are no tiles intersecting with us on this level
-
-    if (p.z >= m_theBoard.getDepth()) {
+    // out of bounds check
+    if (
+        p.z >= m_theBoard.getDepth() ||
+        p.y > m_theBoard.getHeight() - 2 ||
+        p.x > m_theBoard.getWidth() - 2
+    ) {
         return false;
     }
 
-    if (p.y > m_theBoard.getHeight() - 2) {
-        return false;
-    }
-
-    if (p.x > m_theBoard.getWidth() - 2) {
-        return false;
-    }
-
-    //this was causing restrictions in placing two tiles above one
-    POSITION n = p;
-
-    if (p.z != 0) {
-        n.z -= 1;
-        if (!m_theBoard.anyFilled(n)) {
-            return true;
-        }
-    }
-
-    return !m_theBoard.anyFilled(p);
-
-    //this was returning false while inserting z+1 position
-    // return true;
+    return true;
 }
 
 void Editor::closeEvent(QCloseEvent * e)
