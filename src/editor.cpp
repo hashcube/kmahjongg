@@ -628,7 +628,7 @@ bool Editor::canInsert(POSITION & p) const
         return false;
     }
 
-    return true;
+    return !m_theBoard.anyFilled(p);
 }
 
 void Editor::closeEvent(QCloseEvent * e)
