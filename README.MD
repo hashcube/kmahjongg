@@ -24,6 +24,19 @@ Open Board Editor to create the layouts and save it in the tools directory (with
 Also create a corresponding .desktop file referencing this layout
 Go to KMahjong Configuration -> Board Layouts and you can see the newly created layout
 
+## To change tileset assets
+- In the kde tool install location like ~/kde/, tileset assets are at ~/kde/src/libkmahjongg/tilesets
+- Update the asset's svg file using Inkscape(https://inkscape.org/) or any other kde recommended tool
+  - From the svg, copy the old image's id from its object properties then delete the image
+  - Add the new image and resize accordingly then rename its id as the old one
+- Update the tile and face dimensions and offsets in .desktop files as needed
+- Article on updating tileset with Inkscape -> http://freesoftwaremagazine.com/articles/howto_theme_kmahjongg/
+- Updated default tileset is in updated_assets
+- In case of Windows, before opening Kmahjongg the user should delete the old config files from AppData(if any) for changes to show
+  - Files to delete:
+    - C:/Users/your-user-name/AppData/Roaming/kmahjongg/kmahjonggstaterc
+    - C:/Users/your-user-name/AppData/Local/kmahjonggrc
+
 # For Windows
 ## Craft tool pre installation guide
 - Remove any c/c++ compiler like mingw
